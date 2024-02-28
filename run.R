@@ -54,7 +54,7 @@ heur <- roving_antenna |> # calculate a heuristic accounting for signal strength
 kde <- heur |>
   group_by(ID, day) |>
   arrange(ID, day) |>
-  eks::st_kde() # relatively slow but simple to work with the data
+  eks::st_kde() # relatively slow but simple to work with the data. bandwith selector can be modified but kept default here for simplicity.
 
 combinations <- heur |> # to add ID and day data back into `kde`
   group_by(ID, day) |>
