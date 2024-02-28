@@ -25,3 +25,5 @@ Written in R mainly using the `tidyverse` package collection, `sf` for spatial d
     ├── run.R
     └── subglacial_RFID.Rproj
 ```
+
+CC BY
