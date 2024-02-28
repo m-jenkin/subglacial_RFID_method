@@ -253,6 +253,22 @@
       ],
       "Hash": "1046cb48d06cb40c2900d8878f03a0fe"
     },
+    "eks": {
+      "Package": "eks",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "dplyr",
+        "ggplot2",
+        "isoband",
+        "ks",
+        "mapsf",
+        "sf"
+      ],
+      "Hash": "13291502c9055277102b5e13345ea004"
+    },
     "fansi": {
       "Package": "fansi",
       "Version": "1.0.5",
@@ -453,6 +469,36 @@
         "R"
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
+    },
+    "maplegend": {
+      "Package": "maplegend",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "grDevices",
+        "graphics"
+      ],
+      "Hash": "b06b21ed6708a3736f570539414172d5"
+    },
+    "mapsf": {
+      "Package": "mapsf",
+      "Version": "0.9.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "classInt",
+        "grDevices",
+        "graphics",
+        "maplegend",
+        "s2",
+        "sf",
+        "stats",
+        "utils"
+      ],
+      "Hash": "cb56d7e482ba3d2ef2b73e63e20a2b1b"
     },
     "mclust": {
       "Package": "mclust",
