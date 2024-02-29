@@ -23,6 +23,7 @@ The `run.html` file displays the code and rendered output. Written in R mainly u
     │   └── tags.csv
     ├── renv.lock
     ├── run.R
+    ├── run.html
     └── subglacial_RFID.Rproj
 ```
 
