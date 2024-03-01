@@ -9,7 +9,7 @@
 #'  warning: false
 #' ---
 
-pacman::p_load(tools, readr, tidyr, dplyr, lubridate, purrr, ggplot2, scales, sf, ks, eks)
+pacman::p_load(tools, readr, tidyr, dplyr, lubridate, purrr, ggplot2, patchwork, scales, sf, ks, eks)
 #'
 #| include: false
 files_delim <- list.files("./data", pattern = ".csv", full.names = T) |>
@@ -79,12 +79,32 @@ ggplot() +
           subtitle = '2x grid cell scale exaggeration')
 
 #' ## KDE
-#' We then perform a kernel smoothing to estimate the probability density distribution in 2D space of each tagged particle on each survey. The location with the highest probability density (KDE_max) is taken as the particle location, with a 95% confidence interval contour. The along-channel distance of the closest channel point to the KDE_max is computed.
+#' We then perform a kernel smoothing to estimate the probability density distribution in 2D space of each tagged particle on each survey, weighted by the heuristic. The location with the highest probability density (KDE_max) is taken as the particle location, with a 95% confidence interval contour. The along-channel distance of the closest channel point to the KDE_max and the intersections of the 95% CI are computed. The `st_kde()` function is relatively slow but makes it easy to work with the data later on - I would advise parallel computing (e.g. `futures` and `furrr`) for many particles or adapting the code to use the `ks::kde()` function directly. The bandwidth is precomputed and can be changed.
+
+bandwidths <- heur |>
+  group_by(ID, day) |>
+  arrange(ID, day) |>
+  st_drop_geometry() |>
+  group_split() |>
+  map_dfr(~ {
+    h_value <- Hscv.diag(.x[, 8:9])
+    tibble(ID = unique(.x$ID), day = unique(.x$day), H = list(h_value))
+  })
 
 kde <- heur |>
   group_by(ID, day) |>
   arrange(ID, day) |>
-  eks::st_kde() # relatively slow but simple to work with the data. bandwith selector can be modified but kept default here for simplicity.
+  group_split() |>
+  map(~ {
+    current_id <- unique(.x$ID)[1]
+    current_day <- unique(.x$day)[1]
+    h_value <- bandwidths |>
+      filter(ID == current_id, day == current_day) |>
+      pull(H) |>
+      first()
+
+    st_kde(.x, w = .x$heur, H = h_value)
+  })
 
 combinations <- heur |> # to add ID and day data back into `kde`
   group_by(ID, day) |>
@@ -102,11 +122,23 @@ find_max_coords <- function(kde) { # function to extract the KDEmax point
   tibble(x = x_coord, y = y_coord, max_estimate = max_estimate)
 }
 
-kde_max <- map(kde$tidy_ks$ks, find_max_coords) |>
+find_CI <- function(kde) {
+  CI <- kde |> filter(contlabel == 95)
+  intersections <- st_intersection(CI, channel) |>
+    summarise(lower_CI = max(dist),
+              upper_CI = min(dist))
+}
+
+kde_max <- map(kde, ~find_max_coords(.x[['tidy_ks']][['ks']][[1]])) |>
   bind_rows() |>
   bind_cols(combinations) |> # add the ID and day data back in
   st_as_sf(coords = c("x", "y"), crs = 2056) |>
   st_join(channel, join = st_nearest_feature) # KDEmax point gets along-channel distance of nearest point on channel
+
+kde_CI <- map(kde, ~find_CI(.x[['sf']])) |>
+  bind_rows() |>
+  bind_cols(combinations) |>
+  st_drop_geometry()
 
 injection <- tags |> # add in data for when the particle was injected
   select(ID, dep_time) |>
@@ -119,27 +151,33 @@ injection <- tags |> # add in data for when the particle was injected
     z = NA
   ) |>
   st_as_sf(coords = c("x", "y"), crs = 2056)
-kde_max <- bind_rows(injection, kde_max)
+kde_max <- bind_rows(injection, kde_max) |>
+  left_join(kde_CI)
 
 #'
 #| echo: false
-ggplot() +
-  geom_sf(
-    data = channel |>
-      st_union() |>
-      st_cast("LINESTRING"),
-    col = "blue", size = 0.3
-  ) +
-  geom_sf(data = glacier_outline, fill = NA) +
-  geom_sf(data = kde_max, aes(col = factor(day))) +
-  geom_sf(
-    data = st_get_contour(kde, cont = c(94.99, 95)),
-    aes(col = factor(day)), fill = NA
-  ) +
-  facet_wrap(~ID) +
-  theme_bw() +
-  labs(col = "Day") +
-  ggtitle("Particle location on a given survey with 95% CI")
+# To plot all localisations - correct approach using map() but not quite working
+# plot_function <- function(kde, ID, day, channel, glacier_outline) {
+#   data = st_get_contour(kde, cont = c(94.99, 95)) |>
+#       mutate(ID = ID, day = day)
+#
+#   p <- ggplot() +
+#     geom_sf(data = channel |>
+#               st_union() |>
+#               st_cast("LINESTRING"),
+#             col = "blue", size = 0.3) +
+#     geom_sf(data = glacier_outline, fill = NA) +
+#     # geom_sf(data = kde_max, aes(col = factor(day))) +
+#     geom_sf(data = data, aes(col = day), fill = NA) +
+#     theme_bw() +
+#     theme(axis.text = element_blank()) +
+#     ggtitle("Particle location on a given survey with 95% CI")
+#
+#   return(p)
+# }
+#
+# plots <- map2(kde, seq_along(kde), ~plot_function(.x, combinations$ID[.y], combinations$day[.y], channel, glacier_outline))
+# wrap_plots(plots)
 
 #' ## Stationary antennas
 #' We then define an estimated horizontal detection range of each stationary antenna using a spatial buffer and determine the upper and lower limits of detection along the subglacial channel. The time particles spent in range of the antennas is calculated and binned by hourly timesteps.
@@ -164,8 +202,8 @@ stationary_antennas <- stationary_antennas |>
   left_join(antenna_range, by = 'antenna') |>
   mutate(
     bin = cut(time,
-      breaks = seq(1, 365, 1 / 24), # cut data into hourly bins
-      labels = seq(1, 365 - 1 / 24, 1 / 24)
+              breaks = seq(1, 365, 1 / 24), # cut data into hourly bins
+              labels = seq(1, 365 - 1 / 24, 1 / 24)
     ),
     bin = as.numeric(paste(bin))
   ) |>
@@ -179,6 +217,7 @@ stationary_antennas <- stationary_antennas |>
 #' Displaying both the roving antenna KDE_max data (black dots) and stationary antenna data (coloured bars) as a function of along-channel transport distance from the borehole.
 #'
 #| echo: false
+
 ggplot() +
   geom_rect(
     data = stationary_antennas,
@@ -188,13 +227,13 @@ ggplot() +
       alpha = duration, fill = factor(antenna)
     ), show.legend = F
   ) +
+  geom_errorbar(data = kde_max, aes(day, ymin = lower_CI, ymax = upper_CI), width = 0.5) +
   geom_point(data = kde_max, aes(day, dist)) +
-  geom_step(data = kde_max, aes(day, dist)) +
   scale_y_reverse() +
   geom_hline(yintercept = 350, linetype = "dashed") +
   facet_wrap(~ID) +
   theme_bw() +
   ggtitle("Particle transport distance over time",
-    subtitle = "See Jenkin et al. in prep for automated modelling combining roving and stationary antennas"
+          subtitle = "See Jenkin et al. in prep for automated modelling combining roving and stationary antennas"
   )
 
