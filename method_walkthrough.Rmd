@@ -50,7 +50,7 @@ The full paper and supporting information are included as:
 
 The minimal example starts from cleaned inputs in `data/`:
 
-- `roving_antenna.gpkg`: RFID detections joined to dGNSS antenna positions;
+- `roving_antenna.gpkg`: roving RFID detections with dGNSS antenna positions;
 - `dGNSS.gpkg`: one-second roving antenna survey positions;
 - `tags.csv`: tagged particle metadata and deployment times;
 - `survey_times.csv`: representative survey time for each survey day;
@@ -62,6 +62,9 @@ The minimal example starts from cleaned inputs in `data/`:
 To adapt the method elsewhere, the most important site-specific assumptions are
 the coordinate reference system, channel centreline, survey extent, grid size,
 seeding location and stationary antenna detection range.
+
+Particle metadata such as deployment time, mass and grain-size axes are stored
+once in `tags.csv` and joined into the workflow when required.
 
 ```{r load}
 source("scripts/00_setup.R")

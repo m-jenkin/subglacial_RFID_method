@@ -6,7 +6,8 @@ antenna_ranges <- calculate_antenna_ranges(
 
 stat <- calculate_stationary_records(
   stationary_antennas = stationary_antennas,
-  antenna_ranges = antenna_ranges
+  antenna_ranges = antenna_ranges,
+  tags = tags
 )
 
 combined_plot <- plot_combined_records(

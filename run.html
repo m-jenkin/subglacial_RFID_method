@@ -215,7 +215,7 @@ pre code {
 <h2>Inputs</h2>
 <p>The minimal example starts from cleaned inputs in <code>data/</code>:</p>
 <ul>
-<li><code>roving_antenna.gpkg</code>: RFID detections joined to dGNSS antenna positions;</li>
+<li><code>roving_antenna.gpkg</code>: roving RFID detections with dGNSS antenna positions;</li>
 <li><code>dGNSS.gpkg</code>: one-second roving antenna survey positions;</li>
 <li><code>tags.csv</code>: tagged particle metadata and deployment times;</li>
 <li><code>survey_times.csv</code>: representative survey time for each survey day;</li>
@@ -225,6 +225,7 @@ pre code {
 <li><code>glacier_outline.gpkg</code>: context geometry for plotting.</li>
 </ul>
 <p>To adapt the method elsewhere, the most important site-specific assumptions are the coordinate reference system, channel centreline, survey extent, grid size, seeding location and stationary antenna detection range.</p>
+<p>Particle metadata such as deployment time, mass and grain-size axes are stored once in <code>tags.csv</code> and joined into the workflow when required.</p>
 <pre class="r"><code>source(&quot;scripts/00_setup.R&quot;)</code></pre>
 </div>
 <div id="roving-antenna-heuristic" class="section level2">

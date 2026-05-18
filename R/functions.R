@@ -229,12 +229,18 @@ calculate_antenna_ranges <- function(antennas, channel_points, detection_range =
     st_drop_geometry()
 }
 
-calculate_stationary_records <- function(stationary_antennas, antenna_ranges) {
+calculate_stationary_records <- function(stationary_antennas, antenna_ranges, tags) {
   stationary_antennas |>
+    left_join(
+      select(tags, ID, dep_time),
+      by = "ID",
+      relationship = "many-to-one"
+    ) |>
     arrange(ID, time, antenna) |>
     group_by(ID, antenna) |>
     mutate(duration = lead(time) - time) |>
     filter(IO == "In") |>
+    mutate(day = floor(time)) |>
     select(time, day, ID, antenna, duration, dep_time) |>
     filter(time > dep_time) |>
     left_join(antenna_ranges, by = "antenna") |>
