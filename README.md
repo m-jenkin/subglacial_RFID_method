@@ -17,6 +17,13 @@ example data. It supersedes the earlier Zenodo code snapshot for reuse and
 reproducibility, while preserving the scope of a method demonstration rather
 than a full raw-data processing archive.
 
+The archived version of this method capsule is available on Zenodo:
+
+[https://doi.org/10.5281/zenodo.20272565](https://doi.org/10.5281/zenodo.20272565)
+
+If you use this code or data, please cite both the method paper and the Zenodo
+record.
+
 ## What This Reproduces
 
 This is a minimal method capsule. It does not reproduce every result or figure

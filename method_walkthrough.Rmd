@@ -42,6 +42,10 @@ The workflow mirrors the method phases in the paper:
 The full paper and supporting information are available from the publisher via
 the article DOI above; they are not bundled in this method capsule.
 
+The archived version of this method capsule is available on Zenodo:
+<https://doi.org/10.5281/zenodo.20272565>. If you use this code or data, please
+cite both the method paper and the Zenodo record.
+
 ## Inputs
 
 The minimal example starts from cleaned inputs in `data/`:
