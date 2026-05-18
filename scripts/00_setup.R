@@ -1,26 +1,25 @@
+#!/usr/bin/env Rscript
 # =====================================================================
-# Title: Setup method demonstration inputs and constants
+# Title: Set up RFID method-example workflow
 # Author: Matt Jenkin
 #
 # Purpose:
-#   Load package dependencies, helper functions, cleaned input data and
-#   shared constants for the minimal RFID method demonstration.
+#   Load packages, helper functions, input data, and site-specific constants
+#   for the compact RFID particle-tracking method example.
 #
 # Core logic:
-#   1. Source helper functions from R/.
-#   2. Define CRS, spatial tolerances, example plotting settings and
-#      site-specific constants.
-#   3. Load cleaned input tables/geometries from data/.
-#   4. Build a sampled channel centreline used for distance conversion.
+#   - source helper functions from R/
+#   - load required packages
+#   - define CRS, localisation ranges, seeding location, and plotting extent
+#   - load cleaned input data from data/
+#   - build along-channel sample points used for transport-distance mapping
 #
 # Inputs:
-#   R/*.R
-#   data/*.csv
-#   data/*.gpkg
+#   R/*.R helper files
+#   data/*.csv and data/*.gpkg input files
 #
 # Outputs:
-#   Loaded data objects, workflow constants and channel_points in the
-#   global workflow environment.
+#   Objects in the R session used by later scripts.
 # =====================================================================
 
 source("R/packages.R")
@@ -34,20 +33,17 @@ source("R/plots.R")
 
 load_method_packages()
 
-# ---------------------------------------------------------------------
-# 1. Site and method settings
-# ---------------------------------------------------------------------
-
+# Coordinate reference system: Swiss LV95.
 crs_lv95 <- 2056
+
+# Spatial assumptions used by the compact method example.
 ci_buffer_range <- 28
 stationary_detection_range <- 32
 seed_x <- 2599065
 seed_y <- 1087700
 survey_end_distance <- 350
-example_roving_day <- 232
+example_roving_day <- 231
 
-# Analysis extent used for the roving antenna grid. This is deliberately
-# site-specific and should be reviewed before adapting the method elsewhere.
 analysis_bbox <- st_bbox(
   c(
     xmin = 2598650,
@@ -57,10 +53,6 @@ analysis_bbox <- st_bbox(
   ),
   crs = st_crs(crs_lv95)
 )
-
-# ---------------------------------------------------------------------
-# 2. Load cleaned input data and construct channel distance lookup
-# ---------------------------------------------------------------------
 
 load_data_files()
 
@@ -75,6 +67,7 @@ check_required_objects(c(
   "tags"
 ))
 
-# The channel line is sampled into approximately metre-spaced points so
-# later spatial locations can be converted to along-channel distance.
+# Along-channel sample points provide the distance axis used to convert
+# planimetric RFID locations and stationary antenna ranges into transport
+# distance along the inferred channel path.
 channel_points <- build_channel_points(channel_line)

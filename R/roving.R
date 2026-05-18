@@ -1,23 +1,6 @@
-# =====================================================================
-# Title: Roving antenna localisation helpers
-# Author: Matt Jenkin
-#
-# Purpose:
-#   Convert roving antenna detections and dGNSS survey tracks into weighted
-#   particle locations and along-channel transport-distance estimates.
-#
-# Notes:
-#   These functions implement the compact method demonstration. They start
-#   from cleaned observations and do not attempt to recreate all raw field
-#   processing or manual review steps from the full project archive.
-# =====================================================================
-
 calculate_time_in_cell <- function(dGNSS, grid, seed = 1) {
   set.seed(seed)
 
-  # A dGNSS point can fall on a grid boundary and intersect more than one
-  # cell. One intersecting cell is sampled per timestamp so survey effort is
-  # counted once per recorded antenna position.
   dGNSS |>
     st_intersects(grid) |>
     as.data.frame() |>
@@ -41,8 +24,6 @@ calculate_detection_heuristic <- function(roving_antenna, grid, t_in_cell) {
     left_join(t_in_cell, by = c("day", "cell"), relationship = "many-to-many") |>
     mutate(
       mean_RSSI = rescale(mean_RSSI, to = c(0, 1)),
-      # Transparent localisation weight: repeated reads and stronger RSSI
-      # increase weight, while longer survey time in the cell reduces it.
       heur = (n * mean_RSSI) / t_in_cell
     ) |>
     group_by(ID, day) |>
@@ -120,8 +101,6 @@ build_point_locations <- function(kde, seeding, ci_buffer_range = 28) {
     slice_max(max_estimate) |>
     mutate(
       CI_area = as.numeric(st_area(CI)),
-      # Very small or missing contours are replaced by a conservative buffer.
-      # This keeps uncertain cases visible instead of silently dropping them.
       CI = if_else(
         CI_area < 500 | is.na(max_estimate),
         st_buffer(geometry, ci_buffer_range),
@@ -154,11 +133,8 @@ calculate_transport_distances <- function(point_loc, channel_points, seeding,
     st_join(channel_points, join = st_nearest_feature) |>
     st_drop_geometry() |>
     mutate(
-      # Near-zero distances are treated as the seeding location.
       dist = if_else(round(dist) < 3, 0, round(dist)),
       min_dist = if_else(min_dist < 3, 0, min_dist),
-      # If the point estimate falls outside its contour-derived channel
-      # interval, use the interval midpoint as a conservative fallback.
       dist = if_else(dist < min_dist | dist > max_dist, (min_dist + max_dist) / 2, dist),
       min_dist = if_else(is.na(min_dist), dist - ci_buffer_range, min_dist),
       max_dist = if_else(is.na(max_dist), dist + ci_buffer_range, max_dist)

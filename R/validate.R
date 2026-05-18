@@ -1,21 +1,36 @@
 # =====================================================================
-# Title: Output validation helper
+# Title: Validate method-example outputs
 # Author: Matt Jenkin
 #
 # Purpose:
-#   Run lightweight checks that the method demonstration produced non-empty
-#   roving, stationary and combined output records.
+#   Run simple sanity checks on the roving, stationary, and combined
+#   transport-distance tables produced by the method example. These checks
+#   are intended to catch broken joins or empty outputs, not to validate the
+#   full field interpretation.
+#
+# Inputs:
+#   roving_transport_distances
+#   stationary_transport_records
+#   combined_transport_records
+#
+# Output:
+#   Invisible TRUE if checks pass; otherwise stops with a validation error.
 # =====================================================================
 
-validate_method_outputs <- function(t_dist, stat, combi) {
+validate_method_outputs <- function(roving_transport_distances,
+                                    stationary_transport_records,
+                                    combined_transport_records) {
   expected_systems <- c("rov", "stat")
 
   checks <- list(
-    roving_records = nrow(t_dist) > 0,
-    stationary_records = nrow(stat) > 0,
-    combined_records = nrow(combi) > 0,
-    combined_systems = all(expected_systems %in% unique(combi$system)),
-    ordered_distances = all(combi$min_dist <= combi$max_dist, na.rm = TRUE)
+    roving_records = nrow(roving_transport_distances) > 0,
+    stationary_records = nrow(stationary_transport_records) > 0,
+    combined_records = nrow(combined_transport_records) > 0,
+    combined_systems = all(expected_systems %in% unique(combined_transport_records$system)),
+    ordered_distances = all(
+      combined_transport_records$min_dist <= combined_transport_records$max_dist,
+      na.rm = TRUE
+    )
   )
 
   failed_checks <- names(checks)[!unlist(checks)]

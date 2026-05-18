@@ -1,34 +1,20 @@
+#!/usr/bin/env Rscript
 # =====================================================================
-# Title: Run minimal RFID particle-tracking method example
+# Title: Run compact RFID particle-tracking method example
 # Author: Matt Jenkin
 #
 # Purpose:
-#   Machine-readable entry point for the public method demonstration. For
-#   a guided explanation, render method_walkthrough.Rmd or open
-#   method_walkthrough.html.
+#   Machine-readable entry point for the minimal RFID method capsule. For a
+#   guided explanation, render method_walkthrough.Rmd or open the included
+#   walkthrough HTML.
 #
 # Core logic:
-#   1. Check that required workflow files are present.
-#   2. Source each numbered script in method order.
-#   3. Write checked CSV outputs to outputs/.
-#
-# Inputs:
-#   scripts/*.R
-#   R/*.R
-#   data/*
-#
-# Outputs:
-#   outputs/roving_transport_distances.csv
-#   outputs/stationary_transport_records.csv
-#   outputs/combined_transport_records.csv
+#   - check that required files are present
+#   - run the numbered scripts in order
+#   - write compact transport-distance outputs to outputs/
 # =====================================================================
 
 required_files <- c(
-  "scripts/00_setup.R",
-  "scripts/01_roving_heuristic.R",
-  "scripts/02_kde_localisation.R",
-  "scripts/03_stationary_antennas.R",
-  "scripts/04_outputs.R",
   "R/packages.R",
   "R/data_io.R",
   "R/geometry.R",
@@ -44,28 +30,39 @@ required_files <- c(
   "data/roving_antenna.gpkg",
   "data/stationary_antennas.csv",
   "data/survey_times.csv",
-  "data/tags.csv"
+  "data/tags.csv",
+  "scripts/00_setup.R",
+  "scripts/01_roving_heuristic.R",
+  "scripts/02_kde_localisation.R",
+  "scripts/03_stationary_antennas.R",
+  "scripts/04_outputs.R"
 )
 
 missing_files <- required_files[!file.exists(required_files)]
 
 if (length(missing_files) > 0) {
   stop(
-    "Missing required file(s): ",
-    paste(missing_files, collapse = ", "),
+    "Missing required file(s):\n",
+    paste(" -", missing_files, collapse = "\n"),
     call. = FALSE
   )
 }
 
-run_section <- function(label, path) {
-  message("\n==> ", label)
+run_script <- function(path) {
+  message("\n--- Running ", path, " ---")
   source(path, local = .GlobalEnv)
 }
 
-run_section("Setup and input loading", "scripts/00_setup.R")
-run_section("Roving antenna heuristic", "scripts/01_roving_heuristic.R")
-run_section("KDE localisation and along-channel distance", "scripts/02_kde_localisation.R")
-run_section("Stationary antenna interpretation", "scripts/03_stationary_antennas.R")
-run_section("Output tables and validation", "scripts/04_outputs.R")
+scripts <- c(
+  "scripts/00_setup.R",
+  "scripts/01_roving_heuristic.R",
+  "scripts/02_kde_localisation.R",
+  "scripts/03_stationary_antennas.R",
+  "scripts/04_outputs.R"
+)
+
+for (script in scripts) {
+  run_script(script)
+}
 
 message("\nDone. Outputs written to outputs/.")
