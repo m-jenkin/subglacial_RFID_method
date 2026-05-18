@@ -1,5 +1,11 @@
 combi <- combine_transport_records(t_dist, stat)
 
+validate_method_outputs(
+  t_dist = t_dist,
+  stat = stat,
+  combi = combi
+)
+
 if (!dir.exists("outputs")) {
   dir.create("outputs")
 }

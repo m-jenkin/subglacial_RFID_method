@@ -83,8 +83,7 @@ method without first running the code.
 │   ├── 01_roving_heuristic.R    # survey effort and roving detection weighting
 │   ├── 02_kde_localisation.R    # KDE locations and along-channel distance
 │   ├── 03_stationary_antennas.R # stationary antenna reach records
-│   ├── 04_combine_records.R     # final combined output tables
-│   └── 05_validate_outputs.R    # lightweight reproducibility checks
+│   └── 04_outputs.R             # final tables, checks and CSV writing
 ├── data/                        # cleaned minimal input data
 ├── outputs/                     # generated CSV output tables
 ├── assets/report.css            # light styling for the rendered walkthrough

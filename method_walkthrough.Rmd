@@ -142,7 +142,7 @@ The final table combines:
 - stationary antenna reach detections and durations.
 
 ```{r combine}
-source("scripts/04_combine_records.R")
+source("scripts/04_outputs.R")
 dplyr::glimpse(combi)
 ```
 

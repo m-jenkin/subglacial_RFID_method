@@ -7,7 +7,6 @@ source("scripts/00_setup.R")
 source("scripts/01_roving_heuristic.R")
 source("scripts/02_kde_localisation.R")
 source("scripts/03_stationary_antennas.R")
-source("scripts/04_combine_records.R")
-source("scripts/05_validate_outputs.R")
+source("scripts/04_outputs.R")
 
 message("Done. Outputs written to outputs/.")
