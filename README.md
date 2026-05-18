@@ -70,7 +70,13 @@ first running the code.
 ```text
 .
 ├── R/
-│   ├── functions.R              # reusable data, spatial and validation functions
+│   ├── packages.R               # package loading
+│   ├── data_io.R                # input loading and input checks
+│   ├── geometry.R               # spatial helper functions
+│   ├── roving.R                 # roving antenna heuristic and KDE functions
+│   ├── stationary.R             # stationary antenna reach functions
+│   ├── combine.R                # final roving/stationary table assembly
+│   ├── validate.R               # lightweight reproducibility checks
 │   └── plots.R                  # plotting helpers
 ├── scripts/
 │   ├── 00_setup.R               # package loading, constants and input loading

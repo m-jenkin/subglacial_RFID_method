@@ -1,4 +1,10 @@
-source("R/functions.R")
+source("R/packages.R")
+source("R/data_io.R")
+source("R/geometry.R")
+source("R/roving.R")
+source("R/stationary.R")
+source("R/combine.R")
+source("R/validate.R")
 source("R/plots.R")
 
 load_method_packages()
