@@ -2,26 +2,20 @@
 
 Author: Matt Jenkin, University of Lausanne, Switzerland
 
-Published date: February 2024
+Version 2 archive prepared: May 2026
 
 ## Repository Role
 
-This public repository is the reproducibility and reference snapshot for the
-RFID method paper:
+This repository is a compact, public method capsule for the RFID particle
+tracking workflow described in:
 
 [Tracking coarse sediment in an Alpine subglacial channel using radio-tagged
 particles](https://doi.org/10.1017/jog.2023.77)
 
-It is derived from a larger private working/archive repository, `RFID_method`,
-which contains fuller development and manuscript context. In that private
-archive, this repository is linked as the `dist/` Git submodule:
-
-```text
-RFID_method/dist -> https://github.com/m-jenkin/subglacial_RFID.git
-```
-
-This repository should be updated deliberately, when the public method snapshot
-needs correction, clarification, or a more reproducible presentation.
+It is intended as the cleaned reference version of the method code and minimal
+example data. It supersedes the earlier Zenodo code snapshot for reuse and
+reproducibility, while preserving the scope of a method demonstration rather
+than a full raw-data processing archive.
 
 ## What This Reproduces
 
@@ -41,10 +35,8 @@ The workflow demonstrates how to:
 6. estimate stationary antenna detection reaches;
 7. combine roving and stationary records into a single transport table.
 
-The article and supporting information are included for context:
-
-- `JOG2300077.PDF`
-- `JOG2300077_SI.pdf`
+The article and supporting information are not bundled in this repository. They
+are available from the publisher via the paper DOI above.
 
 ## How To Run
 
@@ -91,6 +83,7 @@ method without first running the code.
 ├── run.R                        # machine-readable entry point
 ├── method_walkthrough.html      # rendered walkthrough
 ├── renv.lock                    # R package version lockfile
+├── renv/                        # renv bootstrap/settings files
 └── subglacial_RFID.Rproj
 ```
 
@@ -119,6 +112,7 @@ For another field site, review these assumptions before reuse:
 - KDE bandwidth choice should be re-evaluated for new survey geometries;
 - stationary antenna detection ranges should be calibrated or justified.
 
-## Licence
+## License
 
-CC BY
+This method capsule is released under the Creative Commons Attribution 4.0
+International License (CC BY 4.0). See `LICENSE.md`.

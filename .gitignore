@@ -3,4 +3,10 @@
 .RData
 .Ruserdata
 .DS_Store
-renv/
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/

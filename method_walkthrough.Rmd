@@ -39,10 +39,8 @@ The workflow mirrors the method phases in the paper:
 6.  combine roving and stationary records;
 7.  support inspection and adjustment of particle transport-distance models where required.
 
-The full paper and supporting information are included as:
-
-- `JOG2300077.PDF`
-- `JOG2300077_SI.pdf`
+The full paper and supporting information are available from the publisher via
+the article DOI above; they are not bundled in this method capsule.
 
 ## Inputs
 
