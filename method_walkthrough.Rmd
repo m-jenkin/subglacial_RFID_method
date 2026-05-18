@@ -1,0 +1,158 @@
+---
+title: "RFID Particle-Tracking Method Walkthrough"
+author: "Matt Jenkin"
+date: "February 2024"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    theme: cosmo
+    css: assets/report.css
+    code_folding: hide
+    self_contained: true
+    fig_width: 8
+    fig_height: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center"
+)
+```
+
+## Purpose
+
+This repository is a minimal, reusable example of the computational method used
+in Jenkin et al. (2023), *Tracking coarse sediment in an Alpine subglacial
+channel using radio-tagged particles*. It does not reproduce every analysis in
+the paper. Instead, it shows how roving and stationary active-RFID antenna
+records can be turned into a time series of particle transport distance with
+uncertainty.
+
+The workflow mirrors the method phases in the paper:
+
+1. prepare roving RFID, dGNSS, particle, channel and antenna inputs;
+2. weight roving detections using survey effort and signal strength;
+3. estimate particle locations and uncertainty with KDE;
+4. convert planimetric locations to along-channel transport distance;
+5. convert stationary antenna detections to reach-scale time constraints;
+6. combine roving and stationary records.
+
+The full paper and supporting information are included as:
+
+- `JOG2300077.PDF`
+- `JOG2300077_SI.pdf`
+
+## Inputs
+
+The minimal example starts from cleaned inputs in `data/`:
+
+- `roving_antenna.gpkg`: RFID detections joined to dGNSS antenna positions;
+- `dGNSS.gpkg`: one-second roving antenna survey positions;
+- `tags.csv`: tagged particle metadata and deployment times;
+- `survey_times.csv`: representative survey time for each survey day;
+- `channel_line.gpkg`: estimated transport path;
+- `antennas.gpkg`: stationary antenna positions;
+- `stationary_antennas.csv`: stationary antenna in/out detections;
+- `glacier_outline.gpkg`: context geometry for plotting.
+
+To adapt the method elsewhere, the most important site-specific assumptions are
+the coordinate reference system, channel centreline, survey extent, grid size,
+seeding location and stationary antenna detection range.
+
+```{r load}
+source("scripts/00_setup.R")
+```
+
+## Roving Antenna Heuristic
+
+The roving antenna produces a point cloud of received transmissions for each
+particle on each survey day. A raw point density can be biased by survey effort:
+the antenna may spend longer in one part of the grid than another.
+
+The heuristic used here combines:
+
+- the number of detections in each grid cell;
+- mean received signal strength (`RSSI`) in each grid cell;
+- the time spent surveying each grid cell.
+
+This produces a relative weighting surface used in the KDE localisation step.
+
+```{r heuristic}
+source("scripts/01_roving_heuristic.R")
+heuristic_plot
+```
+
+## KDE Localisation
+
+For each particle-day combination, the weighted roving detections are smoothed
+using kernel density estimation. The maximum-density location is treated as the
+most likely planimetric particle position. The 95% contour is retained as a
+spatial uncertainty estimate.
+
+Small or failed contours are replaced by a conservative circular buffer around
+the point estimate. This keeps the downstream distance workflow explicit about
+uncertainty rather than silently dropping difficult cases.
+
+```{r kde}
+source("scripts/02_kde_localisation.R")
+location_plot
+```
+
+## Along-Channel Distance
+
+The method converts each planimetric point and its uncertainty contour to
+distance along the estimated channel centreline. This step is what turns a map
+location into a sediment transport time series.
+
+```{r distance}
+distance_plot
+```
+
+## Stationary Antennas
+
+Stationary antennas provide a complementary Eulerian record: they constrain when
+particles passed through fixed channel reaches. Here, each antenna is buffered
+by an approximate horizontal detection range and intersected with the channel
+centreline to estimate the along-channel reach covered by that antenna.
+
+```{r stationary}
+source("scripts/03_stationary_antennas.R")
+combined_plot
+```
+
+## Combined Output
+
+The final table combines:
+
+- roving antenna point estimates and uncertainty bounds;
+- stationary antenna reach detections and durations.
+
+```{r combine}
+source("scripts/04_combine_records.R")
+dplyr::glimpse(combi)
+```
+
+The generated CSV files are written to `outputs/`:
+
+- `roving_transport_distances.csv`
+- `stationary_transport_records.csv`
+- `combined_transport_records.csv`
+
+## Reuse Notes
+
+This method is intended as a template, not a black box. For another field site,
+review these assumptions before reuse:
+
+- the CRS and units must be metric;
+- the channel centreline must represent the expected transport path;
+- the grid size should reflect survey density and detection range;
+- RSSI may not scale with distance in the same way at every site;
+- the KDE bandwidth choice should be re-evaluated for new survey geometry;
+- stationary antenna detection ranges should be calibrated or justified.
+
+The purpose of the capsule is to make the computational logic transparent
+enough that readers can reproduce the example and adapt the method deliberately.
