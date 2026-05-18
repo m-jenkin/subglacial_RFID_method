@@ -76,7 +76,15 @@ The roving antenna produces a point cloud of received transmissions for each
 particle on each survey day. A raw point density can be biased by survey effort:
 the antenna may spend longer in one part of the grid than another.
 
-The heuristic used here combines:
+The first plot shows the raw detections for one survey day before any gridding,
+effort correction or KDE smoothing.
+
+```{r raw-roving}
+source("scripts/01_roving_heuristic.R")
+raw_roving_plot
+```
+
+The heuristic then combines:
 
 - the number of detections in each grid cell;
 - mean received signal strength (`RSSI`) in each grid cell;
@@ -85,7 +93,6 @@ The heuristic used here combines:
 This produces a relative weighting surface used in the KDE localisation step.
 
 ```{r heuristic}
-source("scripts/01_roving_heuristic.R")
 heuristic_plot
 ```
 

@@ -1,3 +1,11 @@
+raw_roving_plot <- plot_raw_roving_day(
+  roving_antenna = roving_antenna,
+  glacier_outline = glacier_outline,
+  channel_line = channel_line,
+  example_day = example_roving_day,
+  crs = crs_lv95
+)
+
 grid <- build_analysis_grid(analysis_bbox, cellsize = 2.5)
 
 t_in_cell <- calculate_time_in_cell(dGNSS, grid, seed = 1)

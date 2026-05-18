@@ -59,11 +59,11 @@ This runs the full scripted workflow and writes CSV outputs to `outputs/`.
 For a guided explanation, render the R Markdown walkthrough:
 
 ```r
-rmarkdown::render("method_walkthrough.Rmd", output_file = "run.html")
+rmarkdown::render("method_walkthrough.Rmd", output_file = "method_walkthrough.html")
 ```
 
-The rendered `run.html` is included so readers can inspect the method without
-first running the code.
+The rendered `method_walkthrough.html` is included so readers can inspect the
+method without first running the code.
 
 ## Repository Structure
 
@@ -90,7 +90,7 @@ first running the code.
 ├── assets/report.css            # light styling for the rendered walkthrough
 ├── method_walkthrough.Rmd       # human-readable method walkthrough
 ├── run.R                        # machine-readable entry point
-├── run.html                     # rendered walkthrough
+├── method_walkthrough.html      # rendered walkthrough
 ├── renv.lock                    # R package version lockfile
 └── subglacial_RFID.Rproj
 ```

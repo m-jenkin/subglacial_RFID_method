@@ -1,3 +1,28 @@
+plot_raw_roving_day <- function(roving_antenna, glacier_outline, channel_line,
+                                example_day = 232, crs = 2056) {
+  roving_day <- roving_antenna |>
+    filter(day == example_day)
+
+  ggplot() +
+    geom_sf(data = glacier_outline, fill = "white", colour = "grey70") +
+    geom_sf(data = channel_line, colour = "blue", linewidth = 0.6) +
+    geom_sf(
+      data = roving_day,
+      aes(colour = factor(ID), size = RSSI),
+      alpha = 0.55
+    ) +
+    coord_sf(datum = crs) +
+    theme_bw() +
+    labs(
+      title = paste("Raw roving RFID detections, day", example_day),
+      subtitle = "Points are antenna positions at received transmissions; size is RSSI",
+      x = NULL,
+      y = NULL,
+      colour = "Particle ID",
+      size = "RSSI"
+    )
+}
+
 plot_heuristic_example <- function(heur, glacier_outline, channel_line,
                                    example_id = 4, crs = 2056) {
   hex_data <- st_join(

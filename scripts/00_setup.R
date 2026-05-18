@@ -15,6 +15,7 @@ stationary_detection_range <- 32
 seed_x <- 2599065
 seed_y <- 1087700
 survey_end_distance <- 350
+example_roving_day <- 232
 
 analysis_bbox <- st_bbox(
   c(
