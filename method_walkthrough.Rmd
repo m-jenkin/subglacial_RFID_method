@@ -143,7 +143,7 @@ The final table combines:
 
 ```{r combine}
 source("scripts/04_outputs.R")
-dplyr::glimpse(combi)
+dplyr::glimpse(combined_transport_records)
 ```
 
 The generated CSV files are written to `outputs/`:

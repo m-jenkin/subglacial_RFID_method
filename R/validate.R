@@ -1,3 +1,12 @@
+# =====================================================================
+# Title: Output validation helper
+# Author: Matt Jenkin
+#
+# Purpose:
+#   Run lightweight checks that the method demonstration produced non-empty
+#   roving, stationary and combined output records.
+# =====================================================================
+
 validate_method_outputs <- function(t_dist, stat, combi) {
   expected_systems <- c("rov", "stat")
 

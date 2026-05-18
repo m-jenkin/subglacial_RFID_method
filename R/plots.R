@@ -1,3 +1,11 @@
+# =====================================================================
+# Title: Plot helpers for method walkthrough
+# Author: Matt Jenkin
+#
+# Purpose:
+#   Build the compact diagnostic plots used in method_walkthrough.Rmd.
+# =====================================================================
+
 plot_raw_roving_day <- function(roving_antenna, glacier_outline, channel_line,
                                 example_day = 232, crs = 2056) {
   roving_day <- roving_antenna |>

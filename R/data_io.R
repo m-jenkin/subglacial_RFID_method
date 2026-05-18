@@ -1,3 +1,16 @@
+# =====================================================================
+# Title: Data loading helpers
+# Author: Matt Jenkin
+#
+# Purpose:
+#   Load the cleaned CSV and GeoPackage inputs used by the method
+#   demonstration and check that required objects are available.
+#
+# Notes:
+#   Input filenames are converted to object names. This keeps the compact
+#   public workflow readable, but assumes stable filenames in data/.
+# =====================================================================
+
 load_data_files <- function(data_dir = "data", envir = .GlobalEnv) {
   csv_files <- list.files(data_dir, pattern = "\\.csv$", full.names = TRUE)
   gpkg_files <- list.files(data_dir, pattern = "\\.gpkg$", full.names = TRUE)
