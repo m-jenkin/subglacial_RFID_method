@@ -1,8 +1,8 @@
-# Subglacial RFID Method Snapshot
+# Subglacial RFID particle tracking method: data and R workflow
 
 Author: Matt Jenkin, University of Lausanne, Switzerland
 
-Version 2 archive prepared: May 2026
+May 2026
 
 ## Repository Role
 
