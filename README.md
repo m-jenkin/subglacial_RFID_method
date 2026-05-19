@@ -91,7 +91,7 @@ method without first running the code.
 ├── method_walkthrough.html      # rendered walkthrough
 ├── renv.lock                    # R package version lockfile
 ├── renv/                        # renv bootstrap/settings files
-└── subglacial_RFID.Rproj
+└── subglacial_RFID_method.Rproj
 ```
 
 ## Software Environment
