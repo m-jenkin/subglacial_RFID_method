@@ -4,8 +4,6 @@ Author: Matt Jenkin, University of Lausanne, Switzerland
 
 May 2026
 
-## Repository Role
-
 This repository is a compact, public method capsule for the RFID particle
 tracking workflow described in:
 
@@ -23,13 +21,6 @@ The archived version of this method capsule is available on Zenodo:
 
 If you use this code or data, please cite both the method paper and the Zenodo
 record.
-
-## What This Reproduces
-
-This is a minimal method capsule. It does not reproduce every result or figure
-from the paper. Instead, it shows the computational workflow used to turn active
-RFID roving antenna and stationary antenna records into particle transport
-distance estimates.
 
 The workflow demonstrates how to:
 
@@ -97,7 +88,7 @@ method without first running the code.
 ## Software Environment
 
 The workflow is written in R, mainly using `tidyverse` packages, `sf` for
-spatial data, and `ks`/`eks` for kernel density estimation. An RStudio project
+spatial data, and `ks`/`eks` for 2D kernel density estimation. An RStudio project
 file and [`renv`](https://rstudio.github.io/renv/) lockfile are provided for
 software version management.
 
