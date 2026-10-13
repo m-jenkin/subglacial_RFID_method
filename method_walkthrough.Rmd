@@ -92,7 +92,7 @@ heuristic_plot
 
 For each particle-day combination, the weighted roving detections are smoothed using 2D kernel density estimation with SCV bandwidth adjustment. This produces a probability density surface. The maximum-density location (KDE_max) is treated as the most likely planimetric particle position. The 95% contour is retained as a spatial uncertainty estimate.
 
-Small or failed contours are replaced by a conservative circular buffer around the point estimate rather than silently dropping difficult cases.
+Contours smaller than 500 m² are replaced by a circular buffer with a 28 m radius around the point estimate. Failed KDE or contour calculations stop the workflow with the particle ID and survey day, so the affected observations can be inspected. Seeding locations are known zero-distance observations and have no localisation uncertainty bounds in the output tables.
 
 ```{r kde}
 source("scripts/02_kde_localisation.R")
@@ -114,6 +114,8 @@ distance_plot
 Stationary antennas provide a complementary Eulerian record (as opposed to the Lagrangian record provided by the roving antennas): they constrain when particles were within fixed channel reaches. Here, each antenna is buffered by an approximate horizontal detection range and intersected with the channel centreline to estimate the along-channel reach covered by that antenna.
 
 Stationary antenna records are therefore interpreted as reach-scale constraints rather than precise point locations. They are especially useful for checking whether roving-localisation outputs are consistent with independent detections at fixed antenna positions, and capturing larger particle displacements between roving antenna surveys, but they can be susceptible to noise.
+
+Times and durations are expressed in fractional days. Each detection duration is assigned in full to the hour in which it started, without splitting detections that cross hour boundaries. The grey one-hour bars below therefore mark detection start hours, not the full periods of particle presence. Their shading shows the total duration assigned to each start hour.
 
 ```{r stationary}
 source("scripts/03_stationary_antennas.R")

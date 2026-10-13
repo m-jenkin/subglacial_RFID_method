@@ -145,8 +145,8 @@ plot_combined_records <- function(roving_transport_distances,
     theme_bw() +
     labs(
       title = "Particle transport distance over time",
-      subtitle = "Grey bars indicate stationary antenna detections shaded by duration",
-      alpha = "log duration [hrs]",
+      subtitle = "Grey bars mark detection start hours; shading shows total duration",
+      alpha = "log duration [days]",
       colour = "Particle ID",
       x = 'Day',
       y = "Along-channel transport distance [m]"

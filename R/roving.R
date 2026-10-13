@@ -1,15 +1,15 @@
 calculate_time_in_cell <- function(dGNSS, grid, seed = 1) {
-  set.seed(seed)
-
-  dGNSS |>
-    st_intersects(grid) |>
-    as.data.frame() |>
-    rename(cell = col.id) |>
-    group_by(row.id) |>
-    slice_sample(n = 1) |>
-    ungroup() |>
-    bind_cols(day = dGNSS$day) |>
-    count(day, cell, name = "t_in_cell")
+  withr::with_seed(seed, {
+    dGNSS |>
+      st_intersects(grid) |>
+      as.data.frame() |>
+      rename(cell = col.id) |>
+      group_by(row.id) |>
+      slice_sample(n = 1) |>
+      ungroup() |>
+      bind_cols(day = dGNSS$day) |>
+      count(day, cell, name = "t_in_cell")
+  })
 }
 
 calculate_detection_heuristic <- function(roving_antenna, grid, t_in_cell) {
@@ -18,8 +18,7 @@ calculate_detection_heuristic <- function(roving_antenna, grid, t_in_cell) {
     group_by(ID, day, cell) |>
     reframe(
       n = n(),
-      mean_RSSI = mean(RSSI),
-      .groups = "drop"
+      mean_RSSI = mean(RSSI)
     ) |>
     left_join(t_in_cell, by = c("day", "cell"), relationship = "many-to-many") |>
     mutate(
@@ -40,10 +39,10 @@ calculate_detection_heuristic <- function(roving_antenna, grid, t_in_cell) {
 }
 
 run_kde_localisation <- function(data, crs = 2056) {
-  try({
-    current_id <- data$ID[1]
-    current_day <- data$day[1]
+  current_id <- data$ID[1]
+  current_day <- data$day[1]
 
+  tryCatch({
     bandwidth_data <- data |>
       st_drop_geometry() |>
       select(x, y)
@@ -67,10 +66,20 @@ run_kde_localisation <- function(data, crs = 2056) {
       CI = ci_geometry$geometry
     ) |>
       st_as_sf(crs = crs, coords = c("max_x", "max_y"))
+  }, error = function(error) {
+    stop(
+      sprintf(
+        "KDE localisation failed for particle %s on day %s: %s",
+        current_id, current_day, conditionMessage(error)
+      ),
+      call. = FALSE
+    )
   })
 }
 
 run_all_kdes <- function(heur, crs = 2056) {
+  previous_plan <- future::plan()
+  on.exit(future::plan(previous_plan), add = TRUE)
   future::plan(multisession)
 
   heur |>

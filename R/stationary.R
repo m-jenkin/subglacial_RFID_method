@@ -27,6 +27,8 @@ calculate_stationary_records <- function(stationary_antennas, antenna_ranges, ta
     select(time, day, ID, antenna, duration, dep_time) |>
     filter(time > dep_time) |>
     left_join(antenna_ranges, by = "antenna") |>
+    # Times and durations are in fractional days. Each complete In/Out
+    # duration is assigned to its starting hour; it is not split across hours.
     mutate(
       bin = cut(
         time,

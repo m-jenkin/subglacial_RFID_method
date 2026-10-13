@@ -31,7 +31,8 @@ combined_transport_records <- combine_transport_records(
 validate_method_outputs(
   roving_transport_distances = roving_transport_distances,
   stationary_transport_records = stationary_transport_records,
-  combined_transport_records = combined_transport_records
+  combined_transport_records = combined_transport_records,
+  seeding_locations = seeding_locations
 )
 
 if (!dir.exists("outputs")) {
